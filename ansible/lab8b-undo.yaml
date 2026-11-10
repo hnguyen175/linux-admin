@@ -1,0 +1,31 @@
+---
+- name: deleting groups and users
+  hosts: lst2
+  become: true
+
+  vars_files:
+    - groups.yaml
+    - usrs.yaml
+
+  tasks:
+    - name: remove users
+      loop: "{{ usrs }}"
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        groups: ""
+        state: absent
+        remove: true
+
+    - name: deleting groups
+      loop: "{{ managed_groups }}"
+      ansible.builtin.group:
+        name: "{{ item }}"
+        state: absent
+
+    - name: verify
+      loop: "{{ managed_groups }}"
+      ansible.builtin.getent:
+        key: "{{ item }}"
+        database: group
+      changed_when: false
+

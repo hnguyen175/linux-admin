@@ -1,0 +1,36 @@
+---
+- name: creating groups and users
+  hosts: lst2
+  become: true
+
+  vars_files:
+    - groups.yaml
+    - usrs.yaml
+
+  tasks:
+    - name: creating groups
+      loop: "{{ managed_groups }}"
+      ansible.builtin.group:
+        name: "{{ item }}"
+        state: present
+
+    - name: verify
+      loop: "{{ managed_groups }}"
+      ansible.builtin.getent:
+        key: "{{ item }}"
+        database: group
+      changed_when: false
+
+    - name: users and groups
+      loop: "{{ usrs }}"
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        groups: "{{ item.groups }}"
+        append: true
+        state: present
+
+    - name: verify users
+      loop: "{{ usrs }}"
+      ansible.builtin.command: "id {{item.name}}"
+      changed_when: false
+
