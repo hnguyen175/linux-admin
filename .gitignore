@@ -1,2 +1,2 @@
-ansible/secrets.yaml
+ansible/*/secrets.yaml
 github-passwd
