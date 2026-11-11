@@ -22,10 +22,16 @@
         name: "{{ item }}"
         state: absent
 
+    - name: delete adminjr passwd rule
+      ansible.builtin.file:
+        path: /etc/sudoers.d/adminjr
+        state: absent
+
     - name: verify
       loop: "{{ managed_groups }}"
       ansible.builtin.getent:
         key: "{{ item }}"
         database: group
+        fail_keys: false
       changed_when: false
 

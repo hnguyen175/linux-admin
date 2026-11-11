@@ -1,0 +1,15 @@
+---
+- name: adminjr
+  hosts: lst2
+  become: true
+
+  tasks:
+    - name: adminjr passwd
+      ansible.builtin.copy:
+        src: ./adminjr
+        dest: /etc/sudoers.d/adminjr
+
+    - name: verify
+      ansible.builtin.command: "ls -lah /etc/sudoers.d/"
+      changed_when: false
+
