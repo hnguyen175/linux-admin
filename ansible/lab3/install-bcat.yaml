@@ -1,0 +1,11 @@
+---
+- name: install bat
+  hosts: linux
+  become: true
+
+  tasks:
+    - name: install bat
+      ansible.builtin.apt:
+        name: bat
+        state: present
+
