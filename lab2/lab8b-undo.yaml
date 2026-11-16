@@ -1,0 +1,37 @@
+---
+- name: deleting groups and users
+  hosts: lst2
+  become: true
+
+  vars_files:
+    - groups.yaml
+    - usrs.yaml
+
+  tasks:
+    - name: remove users
+      loop: "{{ usrs }}"
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        groups: ""
+        state: absent
+        remove: true
+
+    - name: deleting groups
+      loop: "{{ managed_groups }}"
+      ansible.builtin.group:
+        name: "{{ item }}"
+        state: absent
+
+    - name: delete adminjr passwd rule
+      ansible.builtin.file:
+        path: /etc/sudoers.d/adminjr
+        state: absent
+
+    - name: verify
+      loop: "{{ managed_groups }}"
+      ansible.builtin.getent:
+        key: "{{ item }}"
+        database: group
+        fail_keys: false
+      changed_when: false
+

@@ -1,0 +1,9 @@
+usrs:
+  - name: bob
+    groups:
+      - adminjr
+      - remote_access
+  - name: alice
+    groups:
+      - offc-grp
+      - remote_access

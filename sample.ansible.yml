@@ -1,0 +1,8 @@
+---
+- name: Sample playbook
+  hosts: linux
+
+  tasks:
+    - name: Sample task
+      ansible.builtin.debug:
+        msg: "Hello, Ansible!"

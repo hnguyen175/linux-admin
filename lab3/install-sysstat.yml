@@ -1,0 +1,11 @@
+---
+- name: install sysstat
+  hosts: linux
+  become: true
+
+  tasks:
+    - name: install sysstat
+      ansible.builtin.apt:
+        name: sysstat
+        update-cache: yes
+        state: present

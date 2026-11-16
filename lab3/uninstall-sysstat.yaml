@@ -1,0 +1,11 @@
+---
+- name: uninstall sysstat
+  hosts: linux
+  become: true
+
+  tasks:
+    - name: uninstall sysstat
+      ansible.builtin.apt:
+        name: sysstat
+        state: absent
+

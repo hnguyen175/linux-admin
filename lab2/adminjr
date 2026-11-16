@@ -1,0 +1,1 @@
+%adminjr ALL=/usr/bin/passwd, !/usr/bin/passwd sysadmin

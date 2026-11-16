@@ -1,0 +1,23 @@
+---
+- name: cp port
+  hosts: linux
+  become: true
+
+  tasks:
+    - name: copy to lst1
+      ansible.builtin.copy:
+        src: ./port_4222
+        dest: /etc/ssh/sshd_config.d/port_4222
+      when: inventory_hostname == 'lst1'
+
+    - name: copy to lst2
+      ansible.builtin.copy:
+        src: ./port_4333
+        dest: /etc/ssh/sshd_config.d/port_4333
+      when: inventory_hostname == 'lst2'
+
+    - name: restart sshd
+      ansible.builtin.systemd_service:
+        name: sshd
+        state: restarted
+
