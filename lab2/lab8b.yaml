@@ -1,5 +1,5 @@
 ---
-- name: creating groups and users
+- name: Creating groups and users
   hosts: lst2
   become: true
 
@@ -9,25 +9,28 @@
     - secrets.yaml
 
   tasks:
-    - name: creating groups
+    - name: Creating groups
       loop: "{{ managed_groups }}"
       ansible.builtin.group:
         name: "{{ item }}"
         state: present
 
-    - name: adminjr passwd
+    - name: Adminjr passwd
       ansible.builtin.copy:
         src: ./adminjr
         dest: /etc/sudoers.d/adminjr
+        owner: root
+        group: root
+        mode: "0440"
 
-    - name: verify
+    - name: Verify
       loop: "{{ managed_groups }}"
       ansible.builtin.getent:
         key: "{{ item }}"
         database: group
       changed_when: false
 
-    - name: users and groups
+    - name: Users and groups
       loop: "{{ usrs }}"
       ansible.builtin.user:
         name: "{{ item.name }}"
@@ -37,8 +40,7 @@
         append: true
         state: present
 
-    - name: verify users
+    - name: Verify users
       loop: "{{ usrs }}"
-      ansible.builtin.command: "id {{item.name}}"
+      ansible.builtin.command: "id {{ item.name }}"
       changed_when: false
-
