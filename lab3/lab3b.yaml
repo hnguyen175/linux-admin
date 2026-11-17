@@ -5,8 +5,24 @@
   gather_facts: false
 
   tasks:
-    - name: Write to journal
+    - name: Write to journal # noqa: no-changed-when risky-shell-pipe
       ansible.builtin.shell:
         cmd: |
-          echo 'Hello from Ansible' | systemd-cat -t ansible
-          journalctl -t ansible -n 5
+          echo 'Hello from Ansible' | systemd-cat -t ansible && journalctl -t ansible -n 5
+      register: journal_result
+
+    - name: Print result
+      ansible.builtin.debug:
+        var: journal_result.stdout_lines
+
+    - name: JSon boot log # noqa no-changed-when
+      ansible.builtin.shell:
+        cmd: |
+          journalctl -b -o json-pretty > /tmp/boot_log.json
+
+    - name: Copy boot log to control node
+      ansible.builtin.fetch:
+        src: /tmp/boot_log.json
+        dest: "{{ playbook_dir }}"
+        mode: "0644"
+        flat: false
