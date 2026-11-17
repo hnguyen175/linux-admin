@@ -1,0 +1,12 @@
+---
+- name: Write to journal
+  hosts: lst1
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Write to journal
+      ansible.builtin.shell:
+        cmd: |
+          echo 'Hello from Ansible' | systemd-cat -t ansible
+          journalctl -t ansible -n 5
