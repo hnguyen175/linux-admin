@@ -1,0 +1,14 @@
+---
+- name: Install sysstat & bat
+  hosts: linux
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Install sysstat & bat
+      ansible.builtin.apt:
+        name:
+          - sysstat
+          - bat
+        update-cache: true
+        state: present

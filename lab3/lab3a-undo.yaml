@@ -1,0 +1,13 @@
+---
+- name: Uninstall sysstat & bat
+  hosts: linux
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Uninstall sysstat & bat
+      ansible.builtin.apt:
+        name:
+          - sysstat
+          - bat
+        state: absent
