@@ -1,0 +1,7 @@
+Host github-repo
+HostName ssh.github.com
+Port 443
+User git
+IdentityFile ~/.ssh/github_deploy
+IdentitiesOnly yes
+IdentityAgent ~/.ssh/github-agent.sock
