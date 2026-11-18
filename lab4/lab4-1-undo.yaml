@@ -15,11 +15,18 @@
         state: absent
       when: inventory_hostname == 'lst1'
 
+    - name: UnInstall ncat on lst2
+      ansible.builtin.apt:
+        name: ncat
+        update_cache: true
+        state: absent
+      when: inventory_hostname == 'lst2'
+
     - name: Gather installed packages
       ansible.builtin.package_facts:
         manager: auto
 
-    - name: Report if packages are not installed
+    - name: Report if packages are not installed on lst1
       ansible.builtin.debug:
         msg: "{{ item }} is not installed on {{ inventory_hostname }}"
       when:
@@ -27,9 +34,9 @@
         - "item not in ansible_facts.packages"
       loop: "{{ services }}"
 
-    - name: ncat is not installed
+    - name: Ncat is not installed on lst2
       ansible.builtin.debug:
         msg: "ncat is not installed on {{ inventory_hostname }}"
       when:
-        - inventory_hostname == 'lst1'
+        - inventory_hostname == 'lst2'
         - "'ncat' not in ansible_facts.packages"
