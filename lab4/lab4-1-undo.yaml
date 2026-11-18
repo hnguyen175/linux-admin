@@ -1,6 +1,6 @@
 ---
 - name: UnInstall packages for lab 4
-  hosts: lst1
+  hosts: linux
   become: true
   gather_facts: false
 
@@ -13,13 +13,23 @@
         name: "{{ services }}"
         update_cache: true
         state: absent
+      when: inventory_hostname == 'lst1'
 
     - name: Gather installed packages
       ansible.builtin.package_facts:
         manager: auto
 
-    - name: Report if packages are still installed
+    - name: Report if packages are not installed
       ansible.builtin.debug:
         msg: "{{ item }} is not installed on {{ inventory_hostname }}"
-      when: "item not in ansible_facts.packages"
+      when:
+        - inventory_hostname == 'lst1'
+        - "item not in ansible_facts.packages"
       loop: "{{ services }}"
+
+    - name: ncat is not installed
+      ansible.builtin.debug:
+        msg: "ncat is not installed on {{ inventory_hostname }}"
+      when:
+        - inventory_hostname == 'lst1'
+        - "'ncat' not in ansible_facts.packages"

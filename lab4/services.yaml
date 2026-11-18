@@ -4,3 +4,4 @@ services:
   - ufw
   - tshark
   - telnet
+  - ncat

@@ -1,6 +1,6 @@
 ---
 - name: Install packages for lab 4
-  hosts: lst1
+  hosts: linux
   become: true
   gather_facts: false
 
@@ -13,6 +13,14 @@
         name: "{{ services }}"
         update_cache: true
         state: present
+      when: inventory_hostname == 'lst1'
+
+    - name: Install ncat on lst2
+      ansible.builtin.apt:
+        name: ncat
+        update_cache: true
+        state: present
+      when: inventory_hostname == 'lst2'
 
     - name: Allow ssh
       community.general.ufw:
@@ -22,15 +30,39 @@
       loop:
         - 22
         - 4222
+        - 9090
+      when: inventory_hostname == 'lst1'
 
     - name: Activate ufw
       community.general.ufw:
         state: enabled
+      when: inventory_hostname == 'lst1'
 
     - name: Verify ufw status # noqa: no-changed-when
       ansible.builtin.command: ufw status numbered
       register: ufw_status
+      when: inventory_hostname == 'lst1'
 
     - name: Dump ufw status
+      when: inventory_hostname == 'lst1'
       ansible.builtin.debug:
         var: ufw_status.stdout_lines
+
+    - name: Gather installed packages
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: Report if packages are installed
+      ansible.builtin.debug:
+        msg: "{{ item }} is installed on {{ inventory_hostname }}"
+      when:
+        - inventory_hostname == 'lst1'
+        - "item in ansible_facts.packages"
+      loop: "{{ services }}"
+
+    - name: Report if ncat is installed
+      ansible.builtin.debug:
+        msg: "ncat is installed on {{ inventory_hostname }}"
+      when:
+        - inventory_hostname == 'lst2'
+        - "'ncat' in ansible_facts.packages"
