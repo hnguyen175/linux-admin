@@ -5,12 +5,12 @@
   gather_facts: false
 
   vars_files:
-    - services.yaml
+    - packages.yaml
 
   tasks:
     - name: UnInstall packages
       ansible.builtin.apt:
-        name: "{{ services }}"
+        name: "{{ packages }}"
         update_cache: true
         state: absent
       when: inventory_hostname == 'lst1'
@@ -32,7 +32,7 @@
       when:
         - inventory_hostname == 'lst1'
         - "item not in ansible_facts.packages"
-      loop: "{{ services }}"
+      loop: "{{ packages }}"
 
     - name: Ncat is not installed on lst2
       ansible.builtin.debug:

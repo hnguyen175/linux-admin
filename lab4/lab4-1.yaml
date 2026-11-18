@@ -5,12 +5,12 @@
   gather_facts: false
 
   vars_files:
-    - services.yaml
+    - packages.yaml
 
   tasks:
     - name: Install packages
       ansible.builtin.apt:
-        name: "{{ services }}"
+        name: "{{ packages }}"
         update_cache: true
         state: present
       when: inventory_hostname == 'lst1'
@@ -58,7 +58,7 @@
       when:
         - inventory_hostname == 'lst1'
         - "item in ansible_facts.packages"
-      loop: "{{ services }}"
+      loop: "{{ packages }}"
 
     - name: Report if ncat is installed
       ansible.builtin.debug:
