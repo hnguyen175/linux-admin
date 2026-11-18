@@ -1,0 +1,36 @@
+---
+- name: Install packages for lab 4
+  hosts: lst1
+  become: true
+  gather_facts: false
+
+  vars_files:
+    - services.yaml
+
+  tasks:
+    - name: Install packages
+      ansible.builtin.apt:
+        name: "{{ services }}"
+        update_cache: true
+        state: present
+
+    - name: Allow ssh
+      community.general.ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop:
+        - 22
+        - 4222
+
+    - name: Activate ufw
+      community.general.ufw:
+        state: enabled
+
+    - name: Verify ufw status # noqa: no-changed-when
+      ansible.builtin.command: ufw status numbered
+      register: ufw_status
+
+    - name: Dump ufw status
+      ansible.builtin.debug:
+        var: ufw_status.stdout_lines

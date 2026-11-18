@@ -1,0 +1,6 @@
+services:
+  - cockpit
+  - lynx
+  - ufw
+  - tshark
+  - telnet

@@ -1,0 +1,17 @@
+---
+- name: Install packages for lab 5
+  hosts: lst1
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Install packages
+      ansible.builtin.apt:
+        name:
+          - isc-dhcp-server
+          - bind9
+          - bind9utils
+          - bind9-doc
+          - dnsutils
+        update_cache: true
+        state: present
