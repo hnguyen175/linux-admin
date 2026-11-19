@@ -79,7 +79,7 @@
 
     - name: Report if packages are installed on lst2
       ansible.builtin.debug:
-        msg: "ncat is installed on {{ inventory_hostname }}"
+        msg: "{{ item }} is installed on {{ inventory_hostname }}"
       when:
         - inventory_hostname == 'lst2'
         - "item in ansible_facts.packages"
