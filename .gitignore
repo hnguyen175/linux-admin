@@ -1,3 +1,6 @@
 ansible/*/secrets.yaml
 github-passwd
 .ansible/*
+
+# data file
+**/data

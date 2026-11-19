@@ -1,7 +1,16 @@
-packages:
+packages_lst1:
   - cockpit
   - lynx
   - ufw
   - tshark
+  - wireshark-common
   - telnet
   - ncat
+
+packages_lst2:
+  - tshark
+  - wireshark-common
+  - ncat
+
+packages_topurge:
+  - wireshark-common

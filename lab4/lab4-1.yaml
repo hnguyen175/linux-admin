@@ -8,19 +8,36 @@
     - packages.yaml
 
   tasks:
-    - name: Install packages
+    - name: Install packages on lst1
       ansible.builtin.apt:
-        name: "{{ packages }}"
+        name: "{{ packages_lst1 }}"
         update_cache: true
         state: present
       when: inventory_hostname == 'lst1'
 
-    - name: Install ncat on lst2
+    - name: Install packages on lst2
       ansible.builtin.apt:
-        name: ncat
+        name: "{{ packages_lst2 }}"
         update_cache: true
         state: present
       when: inventory_hostname == 'lst2'
+
+    - name: Set non-root capture option to YES
+      ansible.builtin.debconf:
+        name: wireshark-common
+        question: wireshark-common/install-setuid
+        vtype: boolean
+        value: 'true'
+
+    - name: Reconfigure wireshark capture permission # noqa no-changed-when
+      ansible.builtin.command: dpkg-reconfigure -f noninteractive wireshark-common
+
+    - name: Add sysadmin to wireshark group
+      ansible.builtin.user:
+        name: sysadmin
+        groups: wireshark
+        append: true
+        state: present
 
     - name: Allow ssh
       community.general.ufw:
@@ -52,17 +69,18 @@
       ansible.builtin.package_facts:
         manager: auto
 
-    - name: Report if packages are installed
+    - name: Report if packages are installed on lst1
       ansible.builtin.debug:
         msg: "{{ item }} is installed on {{ inventory_hostname }}"
       when:
         - inventory_hostname == 'lst1'
         - "item in ansible_facts.packages"
-      loop: "{{ packages }}"
+      loop: "{{ packages_lst1 }}"
 
-    - name: Report if ncat is installed
+    - name: Report if packages are installed on lst2
       ansible.builtin.debug:
         msg: "ncat is installed on {{ inventory_hostname }}"
       when:
         - inventory_hostname == 'lst2'
-        - "'ncat' in ansible_facts.packages"
+        - "item in ansible_facts.packages"
+      loop: "{{ packages_lst2 }}"
