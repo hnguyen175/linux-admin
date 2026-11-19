@@ -1,8 +1,12 @@
 sock="$HOME/.ssh/github-agent.sock"
 
-rm -f -- "$sock"
-git config --local core.sshCommand "ssh -F '$sock'"
-
+# clean up
 pkill -TERM -u "$(id -u)" -x ssh-agent || true
-eval "$(ssh-agent -a "$HOME/.ssh/github-agent.sock" -s)"
-ssh-add -t 8h "$HOME/.ssh/github_deploy"
+rm -f -- "$sock"
+
+# config ssh for using git agent's socket
+git config --local core.sshCommand "ssh -o 'IdentityAgent=$sock' -F $PWD/ssh_config"
+
+# start ssh agent with defined socket and add deploy 8hr expiry key
+# will prompt for passphrase if key is encrypted
+eval "$(ssh-agent -a "$sock" -s)" && ssh-add -t 8h "$HOME/.ssh/github_deploy"
