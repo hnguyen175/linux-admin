@@ -1,4 +1,7 @@
-git config --local core.sshCommand "ssh -F '$PWD/ssh_config'"
+sock="$HOME/.ssh/github-agent.sock"
+
+rm -f -- "$sock"
+git config --local core.sshCommand "ssh -F '$sock'"
 
 pkill -TERM -u "$(id -u)" -x ssh-agent || true
 eval "$(ssh-agent -a "$HOME/.ssh/github-agent.sock" -s)"
