@@ -48,6 +48,7 @@
         proto: tcp
         log: true
         from: 192.168.122.0/24
+        insert_relative_to: last-ipv4
       loop:
         - 4222
         - 9090
