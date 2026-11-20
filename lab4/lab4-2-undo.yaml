@@ -1,0 +1,27 @@
+---
+- name: Lab 4 undo part deux
+  hosts: lst1
+  become: true
+  gather_facts: false
+
+  vars:
+    packages:
+      - isc-dhcp-server
+
+  tasks:
+    - name: UnInstall packages on lst1
+      ansible.builtin.apt:
+        name: "{{ packages }}"
+        update_cache: true
+        state: absent
+
+    - name: Gather packages
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: Report if packages are installed
+      ansible.builtin.debug:
+        msg: " {{ item }} is not installed on {{ inventory_hostname }}"
+      when:
+        - "item not in ansible_facts.packages"
+      loop: "{{ packages }}"

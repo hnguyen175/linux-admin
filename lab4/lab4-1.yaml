@@ -1,3 +1,5 @@
+# Run this for capture UFW/SSH logs
+# sudo journalctl -k -n 0 -f -g '\[UFW (ALLOW|BLOCK)\].*DPT=4222([[:space:]]|$)'
 ---
 - name: Install packages for lab 4
   hosts: linux
@@ -27,7 +29,7 @@
         name: wireshark-common
         question: wireshark-common/install-setuid
         vtype: boolean
-        value: 'true'
+        value: "true"
 
     - name: Reconfigure wireshark capture permission # noqa no-changed-when
       ansible.builtin.command: dpkg-reconfigure -f noninteractive wireshark-common
@@ -44,10 +46,21 @@
         rule: allow
         port: "{{ item }}"
         proto: tcp
+        log: true
+        from: 192.168.122.0/24
       loop:
-        - 22
         - 4222
         - 9090
+      when: inventory_hostname == 'lst1'
+
+    - name: Deny ssh from 192.168.122.202
+      community.general.ufw:
+        rule: deny
+        port: 4222
+        proto: tcp
+        log: true
+        from: 192.168.122.202
+        insert_relative_to: first-ipv4
       when: inventory_hostname == 'lst1'
 
     - name: Activate ufw

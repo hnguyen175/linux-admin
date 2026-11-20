@@ -14,3 +14,4 @@ packages_lst2:
 
 packages_topurge:
   - wireshark-common
+  - ufw

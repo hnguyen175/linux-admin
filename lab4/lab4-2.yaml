@@ -1,0 +1,81 @@
+---
+- name: Lab 4 part deux
+  hosts: lst1
+  become: true
+  gather_facts: false
+
+  vars:
+    packages:
+      - isc-dhcp-server
+
+  tasks:
+    - name: Install packages on lst1
+      ansible.builtin.apt:
+        name: "{{ packages }}"
+        update_cache: true
+        state: present
+
+    - name: Gather packages
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: Report if packages are installed
+      ansible.builtin.debug:
+        msg: " {{ item }} is installed on {{ inventory_hostname }}"
+      when:
+        - "item in ansible_facts.packages"
+      loop: "{{ packages }}"
+
+    - name: Stop the isc-dhcp-server
+      ansible.builtin.service:
+        name: isc-dhcp-server
+        state: stopped
+
+    - name: Backup dhcpd config
+      ansible.builtin.copy:
+        src: /etc/dhcp/dhcpd.conf
+        dest: /etc/dhcp/dhcpd.conf.original
+        owner: root
+        group: root
+        mode: '0644'
+        remote_src: true
+        force: false # do not clobber backup file
+
+    - name: Fetch the dhcp.conf
+      ansible.builtin.fetch:
+        src: /etc/dhcp/dhcpd.conf
+        dest: "{{ playbook_dir }}/"
+        flat: true
+
+    - name: Copy the new dhcp.conf to remote
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/dhcpd.conf.updated"
+        dest: /etc/dhcp/dhcpd.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Replace text in isc-dhcp-server
+      ansible.builtin.replace:
+        path: /etc/default/isc-dhcp-server
+        regexp: '^(INTERFACESv4=).*$'
+        replace: '\1"enp1s0"'
+        backup: true
+
+    - name: Verify syntax # noqa no-changed-when
+      ansible.builtin.command: dhcpd -t
+      register: dhcpd_syntax_check
+
+    - name: Output verification text
+      ansible.builtin.debug:
+        var: dhcpd_syntax_check.stdout_lines
+
+    - name: Started the isc-dhcp-server
+      ansible.builtin.service:
+        name: isc-dhcp-server
+        state: restarted
+      register: dhcp_status
+
+    - name: Print dhcp status
+      ansible.builtin.debug:
+        var: dhcp_status.stdout_lines
