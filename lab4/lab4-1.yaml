@@ -24,6 +24,13 @@
         state: present
       when: inventory_hostname == 'lst2'
 
+    - name: Install packages on lst-dhcp
+      ansible.builtin.apt:
+        name: "{{ packages_lst_dhcp }}"
+        update_cache: true
+        state: present
+      when: inventory_hostname == 'lst-dhcp'
+
     - name: Set non-root capture option to YES
       ansible.builtin.debconf:
         name: wireshark-common
@@ -48,7 +55,6 @@
         proto: tcp
         log: true
         from: 192.168.122.0/24
-        insert_relative_to: last-ipv4
       loop:
         - 4222
         - 9090
@@ -61,7 +67,7 @@
         proto: tcp
         log: true
         from: 192.168.122.202
-        insert_relative_to: first-ipv4
+        insert: 1
       when: inventory_hostname == 'lst1'
 
     - name: Activate ufw
@@ -98,3 +104,12 @@
         - inventory_hostname == 'lst2'
         - "item in ansible_facts.packages"
       loop: "{{ packages_lst2 }}"
+
+
+    - name: Report if packages are installed on lst-dhcp
+      ansible.builtin.debug:
+        msg: "{{ item }} is installed on {{ inventory_hostname }}"
+      when:
+        - inventory_hostname == 'lst-dhcp'
+        - "item in ansible_facts.packages"
+      loop: "{{ packages_lst_dhcp }}"

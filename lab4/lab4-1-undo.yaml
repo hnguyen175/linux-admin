@@ -28,6 +28,13 @@
         state: absent
       when: inventory_hostname == 'lst2'
 
+    - name: UnInstall packages on lst-dhcp
+      ansible.builtin.apt:
+        name: "{{ packages_lst_dhcp }}"
+        update_cache: true
+        state: absent
+      when: inventory_hostname == 'lst-dhcp'
+
     - name: Purge packages
       ansible.builtin.apt:
         name: "{{ packages_topurge }}"
@@ -54,3 +61,11 @@
         - inventory_hostname == 'lst2'
         - "item not in ansible_facts.packages"
       loop: "{{ packages_lst2 }}"
+
+    - name: Report if packages are not installed on lst-dhcp
+      ansible.builtin.debug:
+        msg: "{{ item }} is not installed on {{ inventory_hostname }}"
+      when:
+        - inventory_hostname == 'lst-dhcp'
+        - "item not in ansible_facts.packages"
+      loop: "{{ packages_lst_dhcp }}"
