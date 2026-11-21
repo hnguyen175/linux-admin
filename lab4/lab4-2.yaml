@@ -37,7 +37,7 @@
         dest: /etc/dhcp/dhcpd.conf.original
         owner: root
         group: root
-        mode: '0644'
+        mode: "0644"
         remote_src: true
         force: false # do not clobber backup file
 
@@ -53,12 +53,12 @@
         dest: /etc/dhcp/dhcpd.conf
         owner: root
         group: root
-        mode: '0644'
+        mode: "0644"
 
     - name: Replace text in isc-dhcp-server
       ansible.builtin.replace:
         path: /etc/default/isc-dhcp-server
-        regexp: '^(INTERFACESv4=).*$'
+        regexp: "^(INTERFACESv4=).*$"
         replace: '\1"enp1s0"'
         backup: true
 
@@ -75,7 +75,3 @@
         name: isc-dhcp-server
         state: restarted
       register: dhcp_status
-
-    - name: Print dhcp status
-      ansible.builtin.debug:
-        var: dhcp_status.stdout_lines
